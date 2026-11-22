@@ -497,7 +497,7 @@ const SND=(()=>{
   z.reset(); push([11,78,148,39,188,161,39,188,161,39,1,84,40]); for(let i=0;i<5;i++)frame(); rpos=wpos; }
  function start(music){ if(started)return; started=true;
   try{ ctx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return; }
-  init(); play(music);
+  init(); if(music!=null)play(music);
   const sr=ctx.sampleRate, step=RATE/sr; let pos=0, prev=[0,0];
   node=ctx.createScriptProcessor(2048,0,2);
   node.onaudioprocess=e=>{ calls++; const L=e.outputBuffer.getChannelData(0), R=e.outputBuffer.getChannelData(1);
@@ -508,7 +508,7 @@ const SND=(()=>{
   node.connect(ctx.destination); if(ctx.state==='suspended')ctx.resume(); }
  function play(id){ pending.push([18,id],[16,id]); }
  let muted=false;function mute(){muted=!muted;if(ctx)muted?ctx.suspend():ctx.resume()}
- return {start,play,mute,get on(){return started}, stat:()=>({ctx:ctx&&ctx.state,wpos,rpos,pk,calls})};
+ return {start,play,mute,get ctx(){return ctx},get on(){return started}, stat:()=>({ctx:ctx&&ctx.state,wpos,rpos,pk,calls})};
 })();
 
 return SND;})();

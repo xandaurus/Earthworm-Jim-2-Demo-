@@ -17,8 +17,9 @@ const FR={};for(const k in D.frames){FR[k]=Object.assign({},D.frames[k]);FR[k].i
 const an=D.anim;
 const keys={L:0,R:0,D:0,U:0,C:0,A:0,B:0},prev={};
 const km={ArrowLeft:'L',ArrowRight:'R',ArrowDown:'D',ArrowUp:'U',KeyW:'U',KeyC:'C',Space:'C',KeyA:'A',KeyB:'B',KeyX:'A',KeyZ:'B'};
-addEventListener('keydown',e=>{SND.start(4);if(e.code==='KeyM'&&SND.on)SND.mute();if(km[e.code]){keys[km[e.code]]=1;e.preventDefault()}});
-addEventListener('pointerdown',()=>SND.start(4),{passive:true});
+addEventListener('keydown',e=>{if(Intro.active){if(!e.repeat&&e.code!=='KeyM')Intro.press(e);if(e.code==='KeyM'&&SND.on)SND.mute();return}SND.start(4);if(e.code==='KeyM'&&SND.on)SND.mute();if(km[e.code]){keys[km[e.code]]=1;e.preventDefault()}});
+addEventListener('pointerdown',()=>{if(Intro.active)Intro.press();else SND.start(4)},{passive:true});
+Intro.onDone=()=>{for(const k in keys){keys[k]=0}};
 addEventListener('keyup',e=>{if(km[e.code]){keys[km[e.code]]=0;e.preventDefault()}});
 document.querySelectorAll('#p button').forEach(b=>{const k=b.dataset.k;
  const on=e=>{keys[k]=1;b.classList.add('on');e.preventDefault()},off=e=>{keys[k]=0;b.classList.remove('on');e.preventDefault()};
@@ -161,5 +162,5 @@ function draw(){
 window.__dbg=s=>eval(s);
 const cutIm=D.cut.imgs.map(s=>{const i=new Image();i.src=s;return i});
 let last=performance.now(),acc=0;
-(function loopf(t){acc+=Math.min(100,t-last);last=t;while(acc>=20){tick();acc-=20}draw();requestAnimationFrame(loopf)})(last);
+(function loopf(t){if(Intro.active){Intro.frame(t);last=t;acc=0;requestAnimationFrame(loopf);return}acc+=Math.min(100,t-last);last=t;while(acc>=20){tick();acc-=20}draw();requestAnimationFrame(loopf)})(last);
 })();
